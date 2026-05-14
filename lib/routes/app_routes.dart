@@ -40,7 +40,7 @@ class AppRoutes {
         return _buildRoute(settings, const LeaderboardScreen());
 
       default:
-        return _buildRoute(settings, const SplashScreen());
+        return _buildRoute(settings, const LoginScreen());
     }
   }
 
