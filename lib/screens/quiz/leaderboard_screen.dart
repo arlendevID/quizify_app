@@ -8,6 +8,23 @@ import '../../widgets/leaderboard/leaderboard_tile.dart';
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
 
+  void _goBackToDashboard(BuildContext context) {
+    var dashboardFound = false;
+
+    Navigator.popUntil(context, (route) {
+      if (route.settings.name == RouteNames.dashboard) {
+        dashboardFound = true;
+        return true;
+      }
+
+      return route.isFirst;
+    });
+
+    if (!dashboardFound) {
+      Navigator.pushReplacementNamed(context, RouteNames.dashboard);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,11 +88,13 @@ class LeaderboardScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Positioned(
+            Positioned(
               left: 22,
               right: 22,
               bottom: 18,
-              child: _BottomNav(),
+              child: _BottomNav(
+                onHomeTap: () => _goBackToDashboard(context),
+              ),
             ),
           ],
         ),
@@ -420,7 +439,15 @@ class _TopRankCard extends StatelessWidget {
 }
 
 class _BottomNav extends StatelessWidget {
-  const _BottomNav();
+  final VoidCallback onHomeTap;
+
+  const _BottomNav({
+    required this.onHomeTap,
+  });
+
+  void _openTab(BuildContext context, String routeName) {
+    Navigator.pushReplacementNamed(context, routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -444,12 +471,7 @@ class _BottomNav extends StatelessWidget {
             child: _BottomNavItem(
               icon: Icons.home_rounded,
               label: 'Beranda',
-              onTap: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  RouteNames.dashboard,
-                );
-              },
+              onTap: onHomeTap,
             ),
           ),
           const Expanded(
@@ -459,10 +481,18 @@ class _BottomNav extends StatelessWidget {
               isActive: true,
             ),
           ),
-          const Expanded(
+          Expanded(
             child: _BottomNavItem(
               icon: Icons.person_rounded,
-              label: 'Profil',
+              label: 'User',
+              onTap: () => _openTab(context, RouteNames.user),
+            ),
+          ),
+          Expanded(
+            child: _BottomNavItem(
+              icon: Icons.info_rounded,
+              label: 'About',
+              onTap: () => _openTab(context, RouteNames.aboutDeveloper),
             ),
           ),
         ],
@@ -495,24 +525,24 @@ class _BottomNavItem extends StatelessWidget {
           gradient: isActive ? AppColors.bluePurpleGradient : null,
           borderRadius: BorderRadius.circular(22),
         ),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
               color: isActive ? Colors.white : AppColors.textMuted,
-              size: 22,
+              size: 21,
             ),
-            if (isActive) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.caption.copyWith(
+                color: isActive ? Colors.white : AppColors.textMuted,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               ),
-            ],
+            ),
           ],
         ),
       ),

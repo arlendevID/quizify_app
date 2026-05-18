@@ -9,37 +9,31 @@ import '../../widgets/dashboard/quiz_recommendation_card.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
-  void _goToQuizList(BuildContext context) {
-    Navigator.pushNamed(context, RouteNames.quizList);
+  void _goToQuizList(
+    BuildContext context, {
+    required String categoryTitle,
+    required String heroTitle,
+    required String heroDescription,
+    required IconData heroIcon,
+    required Color heroColor,
+  }) {
+    Navigator.pushNamed(
+      context,
+      RouteNames.quizList,
+      arguments: {
+        'categoryTitle': categoryTitle,
+        'heroTitle': heroTitle,
+        'heroDescription': heroDescription,
+        'heroIcon': heroIcon,
+        'heroColor': heroColor,
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      floatingActionButton: Container(
-        width: 62,
-        height: 62,
-        decoration: BoxDecoration(
-          gradient: AppColors.bluePurpleGradient,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.28),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.add_rounded,
-            color: Colors.white,
-            size: 34,
-          ),
-        ),
-      ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -57,8 +51,16 @@ class DashboardScreen extends StatelessWidget {
 
                   _SectionHeader(
                     title: 'Rekomendasi Untukmu',
-                    actionText: 'Lihat Semua',
-                    onTap: () => _goToQuizList(context),
+                    actionText: '',
+                    onTap: () => _goToQuizList(
+                      context,
+                      categoryTitle: 'Teknologi',
+                      heroTitle: 'Eksplorasi Teknologi',
+                      heroDescription:
+                          'Jelajahi dunia teknologi dari AI hingga Hardware. Uji pengetahuanmu dan jadilah master di era digital.',
+                      heroIcon: Icons.computer_rounded,
+                      heroColor: AppColors.primary,
+                    ),
                   ),
 
                   const SizedBox(height: 16),
@@ -75,7 +77,15 @@ class DashboardScreen extends StatelessWidget {
                           estimatedMinutes: 18,
                           icon: Icons.security_rounded,
                           gradient: AppColors.bluePurpleGradient,
-                          onTap: () => _goToQuizList(context),
+                          onTap: () => _goToQuizList(
+                            context,
+                            categoryTitle: 'Keamanan Siber',
+                            heroTitle: 'Garis Depan Siber',
+                            heroDescription:
+                                'Pelajari cara melindungi data dan sistem dari ancaman digital melalui tantangan keamanan siber.',
+                            heroIcon: Icons.security_rounded,
+                            heroColor: AppColors.primary,
+                          ),
                         ),
                         const SizedBox(width: 14),
                         QuizRecommendationCard(
@@ -86,7 +96,15 @@ class DashboardScreen extends StatelessWidget {
                           icon: Icons.functions_rounded,
                           gradient: AppColors.goldGradient,
                           darkText: true,
-                          onTap: () => _goToQuizList(context),
+                          onTap: () => _goToQuizList(
+                            context,
+                            categoryTitle: 'Matematika',
+                            heroTitle: 'Kalkulus Lanjutan',
+                            heroDescription:
+                                'Asah logika dan pemahaman rumus melalui kuis matematika yang menantang.',
+                            heroIcon: Icons.functions_rounded,
+                            heroColor: AppColors.tertiary,
+                          ),
                         ),
                       ],
                     ),
@@ -115,14 +133,30 @@ class DashboardScreen extends StatelessWidget {
                         quizCount: 32,
                         icon: Icons.computer_rounded,
                         color: AppColors.primary,
-                        onTap: () => _goToQuizList(context),
+                        onTap: () => _goToQuizList(
+                          context,
+                          categoryTitle: 'Teknologi',
+                          heroTitle: 'Eksplorasi Teknologi',
+                          heroDescription:
+                              'Jelajahi dunia teknologi dari AI hingga Hardware. Uji pengetahuanmu dan jadilah master di era digital.',
+                          heroIcon: Icons.computer_rounded,
+                          heroColor: AppColors.primary,
+                        ),
                       ),
                       CategoryCard(
                         title: 'Umum',
                         quizCount: 21,
                         icon: Icons.public_rounded,
                         color: AppColors.secondary,
-                        onTap: () => _goToQuizList(context),
+                        onTap: () => _goToQuizList(
+                          context,
+                          categoryTitle: 'Umum',
+                          heroTitle: 'Pengetahuan Umum',
+                          heroDescription:
+                              'Uji wawasan luasmu dari topik sehari-hari, budaya, dunia, dan fakta menarik lainnya.',
+                          heroIcon: Icons.public_rounded,
+                          heroColor: AppColors.secondary,
+                        ),
                       ),
                       CategoryCard(
                         title: 'Bahasa',
@@ -130,14 +164,30 @@ class DashboardScreen extends StatelessWidget {
                         icon: Icons.translate_rounded,
                         color: AppColors.tertiary,
                         darkText: true,
-                        onTap: () => _goToQuizList(context),
+                        onTap: () => _goToQuizList(
+                          context,
+                          categoryTitle: 'Bahasa',
+                          heroTitle: 'Eksplorasi Bahasa',
+                          heroDescription:
+                              'Latih kosakata, tata bahasa, dan kemampuan memahami bahasa lewat tantangan singkat.',
+                          heroIcon: Icons.translate_rounded,
+                          heroColor: AppColors.tertiary,
+                        ),
                       ),
                       CategoryCard(
                         title: 'Matematika',
                         quizCount: 27,
                         icon: Icons.calculate_rounded,
                         color: Color(0xFF22C55E),
-                        onTap: () => _goToQuizList(context),
+                        onTap: () => _goToQuizList(
+                          context,
+                          categoryTitle: 'Matematika',
+                          heroTitle: 'Tantangan Matematika',
+                          heroDescription:
+                              'Asah kemampuan berhitung, logika, dan pemecahan masalah dalam kuis matematika.',
+                          heroIcon: Icons.calculate_rounded,
+                          heroColor: const Color(0xFF22C55E),
+                        ),
                       ),
                     ],
                   ),
@@ -300,9 +350,9 @@ class _StatsRow extends StatelessWidget {
       children: const [
         Expanded(
           child: _StatCard(
-            value: '7 Hari',
-            label: 'Rentetan Harian',
-            icon: Icons.local_fire_department_rounded,
+            value: '27',
+            label: 'Quiz Selesai',
+            icon: Icons.quiz_rounded,
           ),
         ),
         SizedBox(width: 14),
@@ -394,6 +444,10 @@ class _SectionHeader extends StatelessWidget {
 class _BottomNav extends StatelessWidget {
   const _BottomNav();
 
+  void _openTab(BuildContext context, String routeName) {
+    Navigator.pushReplacementNamed(context, routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -423,15 +477,21 @@ class _BottomNav extends StatelessWidget {
             child: _BottomNavItem(
               icon: Icons.emoji_events_rounded,
               label: 'Peringkat',
-              onTap: () {
-                Navigator.pushNamed(context, RouteNames.leaderboard);
-              },
+              onTap: () => _openTab(context, RouteNames.leaderboard),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: _BottomNavItem(
               icon: Icons.person_rounded,
-              label: 'Profil',
+              label: 'User',
+              onTap: () => _openTab(context, RouteNames.user),
+            ),
+          ),
+          Expanded(
+            child: _BottomNavItem(
+              icon: Icons.info_rounded,
+              label: 'About',
+              onTap: () => _openTab(context, RouteNames.aboutDeveloper),
             ),
           ),
         ],
@@ -464,23 +524,24 @@ class _BottomNavItem extends StatelessWidget {
           gradient: isActive ? AppColors.bluePurpleGradient : null,
           borderRadius: BorderRadius.circular(22),
         ),
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
               color: isActive ? Colors.white : AppColors.textMuted,
-              size: 22,
+              size: 21,
             ),
-            if (isActive) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: AppTextStyles.labelMedium.copyWith(
-                  color: Colors.white,
-                ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.caption.copyWith(
+                color: isActive ? Colors.white : AppColors.textMuted,
+                fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
               ),
-            ],
+            ),
           ],
         ),
       ),

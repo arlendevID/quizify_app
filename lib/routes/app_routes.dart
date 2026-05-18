@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/auth/splash_screen.dart';
+import '../screens/quiz/about_developer_screen.dart';
 import '../screens/quiz/dashboard_screen.dart';
 import '../screens/quiz/leaderboard_screen.dart';
 import '../screens/quiz/quiz_list_screen.dart';
 import '../screens/quiz/quiz_screen.dart';
 import '../screens/quiz/result_screen.dart';
+import '../screens/quiz/user_screen.dart';
 import 'route_names.dart';
 
 class AppRoutes {
@@ -26,6 +28,12 @@ class AppRoutes {
 
       case RouteNames.dashboard:
         return _buildRoute(settings, const DashboardScreen());
+
+      case RouteNames.user:
+        return _buildRoute(settings, const UserScreen());
+
+      case RouteNames.aboutDeveloper:
+        return _buildRoute(settings, const AboutDeveloperScreen());
 
       case RouteNames.quizList:
         return _buildRoute(settings, const QuizListScreen());

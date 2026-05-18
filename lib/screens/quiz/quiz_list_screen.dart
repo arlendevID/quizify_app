@@ -8,8 +8,39 @@ import '../../widgets/quiz/quiz_list_tile.dart';
 class QuizListScreen extends StatelessWidget {
   const QuizListScreen({super.key});
 
+  void _goBackToDashboard(BuildContext context) {
+    var dashboardFound = false;
+
+    Navigator.popUntil(context, (route) {
+      if (route.settings.name == RouteNames.dashboard) {
+        dashboardFound = true;
+        return true;
+      }
+
+      return route.isFirst;
+    });
+
+    if (!dashboardFound) {
+      Navigator.pushReplacementNamed(context, RouteNames.dashboard);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final routeArguments = ModalRoute.of(context)?.settings.arguments;
+    final categoryData = routeArguments is Map<String, dynamic>
+        ? routeArguments
+        : const <String, dynamic>{};
+    final categoryTitle =
+        categoryData['categoryTitle'] as String? ?? 'Teknologi';
+    final heroTitle =
+        categoryData['heroTitle'] as String? ?? 'Eksplorasi Teknologi';
+    final heroDescription = categoryData['heroDescription'] as String? ??
+        'Jelajahi dunia teknologi dari AI hingga Hardware. Uji pengetahuanmu dan jadilah master di era digital.';
+    final heroIcon = categoryData['heroIcon'] as IconData? ??
+        Icons.computer_rounded;
+    final heroColor = categoryData['heroColor'] as Color? ?? AppColors.primary;
+
     final quizzes = [
       _QuizItem(
         title: 'Dasar-dasar AI',
@@ -71,9 +102,18 @@ class QuizListScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const _QuizListHeader(),
+                  _QuizListHeader(
+                    title: categoryTitle,
+                    color: heroColor,
+                    onBackTap: () => _goBackToDashboard(context),
+                  ),
                   const SizedBox(height: 24),
-                  const _HeroCategoryCard(),
+                  _HeroCategoryCard(
+                    title: heroTitle,
+                    description: heroDescription,
+                    icon: heroIcon,
+                    color: heroColor,
+                  ),
                   const SizedBox(height: 28),
                   Text(
                     'Pilih Tantangan',
@@ -107,11 +147,13 @@ class QuizListScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const Positioned(
+            Positioned(
               left: 22,
               right: 22,
               bottom: 18,
-              child: _FloatingBottomNav(),
+              child: _FloatingBottomNav(
+                onHomeTap: () => _goBackToDashboard(context),
+              ),
             ),
           ],
         ),
@@ -141,7 +183,15 @@ class _QuizItem {
 }
 
 class _QuizListHeader extends StatelessWidget {
-  const _QuizListHeader();
+  final String title;
+  final Color color;
+  final VoidCallback onBackTap;
+
+  const _QuizListHeader({
+    required this.title,
+    required this.color,
+    required this.onBackTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -149,14 +199,12 @@ class _QuizListHeader extends StatelessWidget {
       children: [
         _CircleIconButton(
           icon: Icons.arrow_back_rounded,
-          onTap: () {
-            Navigator.pushReplacementNamed(context, RouteNames.dashboard);
-          },
+          onTap: onBackTap,
         ),
         const SizedBox(width: 14),
         Expanded(
           child: Text(
-            'Teknologi',
+            title,
             style: AppTextStyles.headingLarge.copyWith(
               fontWeight: FontWeight.w800,
             ),
@@ -178,7 +226,7 @@ class _QuizListHeader extends StatelessWidget {
           child: Text(
             'Lv. 12',
             style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.primary,
+              color: color,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -188,11 +236,18 @@ class _QuizListHeader extends StatelessWidget {
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            gradient: AppColors.bluePurpleGradient,
+            gradient: LinearGradient(
+              colors: [
+                color,
+                Color.lerp(color, Colors.black, 0.22) ?? color,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.18),
+                color: color.withOpacity(0.18),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -210,7 +265,17 @@ class _QuizListHeader extends StatelessWidget {
 }
 
 class _HeroCategoryCard extends StatelessWidget {
-  const _HeroCategoryCard();
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+
+  const _HeroCategoryCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -218,11 +283,18 @@ class _HeroCategoryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: AppColors.bluePurpleGradient,
+        gradient: LinearGradient(
+          colors: [
+            color,
+            Color.lerp(color, Colors.black, 0.22) ?? color,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(36),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.25),
+            color: color.withOpacity(0.25),
             blurRadius: 34,
             offset: const Offset(0, 18),
           ),
@@ -253,8 +325,8 @@ class _HeroCategoryCard extends StatelessWidget {
                       color: Colors.white.withOpacity(0.24),
                     ),
                   ),
-                  child: const Icon(
-                    Icons.computer_rounded,
+                  child: Icon(
+                    icon,
                     color: Colors.white,
                     size: 50,
                   ),
@@ -262,7 +334,7 @@ class _HeroCategoryCard extends StatelessWidget {
               ),
               const SizedBox(height: 22),
               Text(
-                'Eksplorasi Teknologi',
+                title,
                 style: AppTextStyles.headingLarge.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
@@ -270,7 +342,7 @@ class _HeroCategoryCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Jelajahi dunia teknologi dari AI hingga Hardware. Uji pengetahuanmu dan jadilah master di era digital.',
+                description,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: Colors.white.withOpacity(0.82),
                   height: 1.55,
@@ -285,7 +357,11 @@ class _HeroCategoryCard extends StatelessWidget {
 }
 
 class _FloatingBottomNav extends StatelessWidget {
-  const _FloatingBottomNav();
+  final VoidCallback onHomeTap;
+
+  const _FloatingBottomNav({
+    required this.onHomeTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -309,19 +385,14 @@ class _FloatingBottomNav extends StatelessWidget {
             child: _BottomNavItem(
               icon: Icons.home_rounded,
               label: 'Home',
-              onTap: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  RouteNames.dashboard,
-                );
-              },
+              isActive: true,
+              onTap: onHomeTap,
             ),
           ),
           const Expanded(
             child: _BottomNavItem(
               icon: Icons.emoji_events_rounded,
               label: 'Ranks',
-              isActive: true,
             ),
           ),
           const Expanded(
