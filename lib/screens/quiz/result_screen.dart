@@ -16,37 +16,146 @@ class ResultScreen extends StatefulWidget {
 
 class _ResultScreenState extends State<ResultScreen> {
   bool showReview = false;
+  bool hasLoadedArguments = false;
 
-  final List<_AnswerReviewData> reviewData = const [
-    _AnswerReviewData(
-      questionNumber: 1,
-      questionText: 'Planet terbesar di tata surya adalah?',
-      userAnswer: 'Jupiter',
-      correctAnswer: 'Jupiter',
-      isCorrect: true,
-    ),
-    _AnswerReviewData(
-      questionNumber: 2,
-      questionText: 'Planet yang dikenal sebagai Planet Merah adalah?',
-      userAnswer: 'Mars',
-      correctAnswer: 'Mars',
-      isCorrect: true,
-    ),
-    _AnswerReviewData(
-      questionNumber: 3,
-      questionText: 'Satelit alami bumi disebut?',
-      userAnswer: 'Matahari',
-      correctAnswer: 'Bulan',
-      isCorrect: false,
-    ),
-    _AnswerReviewData(
-      questionNumber: 4,
-      questionText: 'Pusat tata surya kita adalah?',
-      userAnswer: 'Matahari',
-      correctAnswer: 'Matahari',
-      isCorrect: true,
-    ),
-  ];
+  String quizTitle = 'Quiz';
+  int totalQuestions = 0;
+  int correctAnswers = 0;
+  int wrongAnswers = 0;
+  int scorePercentage = 0;
+  Map<String, dynamic> quizListArguments = const <String, dynamic>{};
+  List<_AnswerReviewData> reviewData = const [];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (hasLoadedArguments) {
+      return;
+    }
+
+    final routeArguments = ModalRoute.of(context)?.settings.arguments;
+
+    if (routeArguments is Map<String, dynamic>) {
+      quizTitle = routeArguments['quizTitle'] as String? ?? quizTitle;
+      totalQuestions = routeArguments['totalQuestions'] as int? ?? 0;
+      correctAnswers = routeArguments['correctAnswers'] as int? ?? 0;
+      wrongAnswers = routeArguments['wrongAnswers'] as int? ?? 0;
+      scorePercentage = routeArguments['scorePercentage'] as int? ?? 0;
+      final rawQuizListArguments = routeArguments['quizListArguments'];
+      if (rawQuizListArguments is Map<String, dynamic>) {
+        quizListArguments = rawQuizListArguments;
+      }
+      reviewData = _buildReviewData(
+        routeArguments['questions'],
+        routeArguments['selectedAnswers'],
+      );
+    }
+
+    hasLoadedArguments = true;
+  }
+
+  void _goBackToQuizList() {
+    var quizListFound = false;
+
+    Navigator.popUntil(context, (route) {
+      if (route.settings.name == RouteNames.quizList) {
+        quizListFound = true;
+        return true;
+      }
+
+      return route.isFirst;
+    });
+
+    if (!quizListFound) {
+      Navigator.pushReplacementNamed(
+        context,
+        RouteNames.quizList,
+        arguments: quizListArguments,
+      );
+    }
+  }
+
+  void _goBackToDashboard() {
+    var dashboardFound = false;
+
+    Navigator.popUntil(context, (route) {
+      if (route.settings.name == RouteNames.dashboard) {
+        dashboardFound = true;
+        return true;
+      }
+
+      return route.isFirst;
+    });
+
+    if (!dashboardFound) {
+      Navigator.pushReplacementNamed(context, RouteNames.dashboard);
+    }
+  }
+
+  List<_AnswerReviewData> _buildReviewData(
+    dynamic rawQuestions,
+    dynamic rawSelectedAnswers,
+  ) {
+    if (rawQuestions is! List) {
+      return const [];
+    }
+
+    final selectedAnswers = <int, int>{};
+    if (rawSelectedAnswers is Map) {
+      rawSelectedAnswers.forEach((key, value) {
+        final questionIndex = key is int ? key : int.tryParse('$key');
+        if (questionIndex != null && value is int) {
+          selectedAnswers[questionIndex] = value;
+        }
+      });
+    }
+
+    final reviews = <_AnswerReviewData>[];
+
+    for (var index = 0; index < rawQuestions.length; index++) {
+      final item = rawQuestions[index];
+
+      if (item is! Map) {
+        continue;
+      }
+
+      final questionText = item['question'];
+      final options = item['options'];
+      final correctIndex = item['correctIndex'];
+
+      if (questionText is! String ||
+          options is! List ||
+          correctIndex is! int) {
+        continue;
+      }
+
+      final parsedOptions = options.whereType<String>().toList();
+      if (correctIndex < 0 || correctIndex >= parsedOptions.length) {
+        continue;
+      }
+
+      final selectedIndex = selectedAnswers[index];
+      final hasSelectedAnswer = selectedIndex != null &&
+          selectedIndex >= 0 &&
+          selectedIndex < parsedOptions.length;
+      final userAnswer = hasSelectedAnswer
+          ? parsedOptions[selectedIndex]
+          : 'Tidak dijawab';
+
+      reviews.add(
+        _AnswerReviewData(
+          questionNumber: index + 1,
+          questionText: questionText,
+          userAnswer: userAnswer,
+          correctAnswer: parsedOptions[correctIndex],
+          isCorrect: selectedIndex == correctIndex,
+        ),
+      );
+    }
+
+    return reviews;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +173,17 @@ class _ResultScreenState extends State<ResultScreen> {
                   const SizedBox(height: 24),
                   const _CelebrationSection(),
                   const SizedBox(height: 20),
-                  const _ScoreCard(),
+                  _ScoreCard(
+                    quizTitle: quizTitle,
+                    scorePercentage: scorePercentage,
+                  ),
                   const SizedBox(height: 18),
-                  const Row(
+                  Row(
                     children: [
                       Expanded(
                         child: ScoreSummaryCard(
                           title: 'Akurasi',
-                          value: '92%',
+                          value: '$scorePercentage%',
                           icon: Icons.track_changes_rounded,
                           iconColor: AppColors.primary,
                         ),
@@ -79,28 +191,33 @@ class _ResultScreenState extends State<ResultScreen> {
                       SizedBox(width: 14),
                       Expanded(
                         child: ScoreSummaryCard(
-                          title: 'Rentetan',
-                          value: '5 Hari',
-                          icon: Icons.local_fire_department_rounded,
+                          title: 'Benar',
+                          value: '$correctAnswers/$totalQuestions',
+                          icon: Icons.check_circle_rounded,
                           iconColor: AppColors.tertiary,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 26),
-                  const _PerformanceDetail(),
+                  _PerformanceDetail(
+                    totalQuestions: totalQuestions,
+                    correctAnswers: correctAnswers,
+                    wrongAnswers: wrongAnswers,
+                  ),
                   const SizedBox(height: 20),
                   const _LevelUpCard(),
                   const SizedBox(height: 24),
                   CustomButton(
                     text: 'Main Lagi',
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        RouteNames.dashboard,
-                      );
-                    },
+                    onPressed: _goBackToQuizList,
                     type: QuizifyButtonType.primary,
+                  ),
+                  const SizedBox(height: 14),
+                  CustomButton(
+                    text: 'Kembali ke Dashboard',
+                    onPressed: _goBackToDashboard,
+                    type: QuizifyButtonType.outlined,
                   ),
                   const SizedBox(height: 14),
                   CustomButton(
@@ -121,23 +238,30 @@ class _ResultScreenState extends State<ResultScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: reviewData.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 14),
-                      itemBuilder: (context, index) {
-                        final item = reviewData[index];
+                    if (reviewData.isEmpty)
+                      Text(
+                        'Data review belum tersedia.',
+                        style: AppTextStyles.bodyMedium,
+                      )
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: reviewData.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: 14),
+                        itemBuilder: (context, index) {
+                          final item = reviewData[index];
 
-                        return AnswerReviewCard(
-                          questionNumber: item.questionNumber,
-                          questionText: item.questionText,
-                          userAnswer: item.userAnswer,
-                          correctAnswer: item.correctAnswer,
-                          isCorrect: item.isCorrect,
-                        );
-                      },
-                    ),
+                          return AnswerReviewCard(
+                            questionNumber: item.questionNumber,
+                            questionText: item.questionText,
+                            userAnswer: item.userAnswer,
+                            correctAnswer: item.correctAnswer,
+                            isCorrect: item.isCorrect,
+                          );
+                        },
+                      ),
                   ],
                 ],
               ),
@@ -290,7 +414,13 @@ class _CelebrationSection extends StatelessWidget {
 }
 
 class _ScoreCard extends StatelessWidget {
-  const _ScoreCard();
+  final String quizTitle;
+  final int scorePercentage;
+
+  const _ScoreCard({
+    required this.quizTitle,
+    required this.scorePercentage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -325,14 +455,14 @@ class _ScoreCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Skor Akhir',
+                quizTitle,
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: Colors.white.withOpacity(0.80),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                '850 XP',
+                '$scorePercentage%',
                 style: AppTextStyles.displayLarge.copyWith(
                   color: Colors.white,
                   fontSize: 42,
@@ -348,10 +478,25 @@ class _ScoreCard extends StatelessWidget {
 }
 
 class _PerformanceDetail extends StatelessWidget {
-  const _PerformanceDetail();
+  final int totalQuestions;
+  final int correctAnswers;
+  final int wrongAnswers;
+
+  const _PerformanceDetail({
+    required this.totalQuestions,
+    required this.correctAnswers,
+    required this.wrongAnswers,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final correctProgress = totalQuestions == 0
+        ? 0.0
+        : (correctAnswers / totalQuestions).clamp(0.0, 1.0);
+    final wrongProgress = totalQuestions == 0
+        ? 0.0
+        : (wrongAnswers / totalQuestions).clamp(0.0, 1.0);
+
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -370,17 +515,17 @@ class _PerformanceDetail extends StatelessWidget {
         children: [
           Text('Rincian Performa', style: AppTextStyles.headingSmall),
           const SizedBox(height: 18),
-          const _PerformanceBar(
+          _PerformanceBar(
             label: 'Jawaban Benar',
-            value: '12/13',
-            progress: 0.92,
+            value: '$correctAnswers/$totalQuestions',
+            progress: correctProgress,
             color: AppColors.primary,
           ),
-          SizedBox(height: 18),
+          const SizedBox(height: 18),
           _PerformanceBar(
             label: 'Kesalahan',
-            value: '1',
-            progress: 0.08,
+            value: '$wrongAnswers',
+            progress: wrongProgress,
             color: AppColors.error,
           ),
         ],

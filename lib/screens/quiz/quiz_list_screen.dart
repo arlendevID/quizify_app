@@ -8,6 +8,63 @@ import '../../widgets/quiz/quiz_list_tile.dart';
 class QuizListScreen extends StatelessWidget {
   const QuizListScreen({super.key});
 
+  List<Map<String, dynamic>> _sampleQuestions(String quizTitle) {
+    return [
+      {
+        'question': 'Apa fokus utama dari $quizTitle?',
+        'options': ['Konsep dasar', 'Olahraga', 'Musik', 'Kuliner'],
+        'correctIndex': 0,
+      },
+      {
+        'question': 'Apa manfaat mengikuti kuis ini?',
+        'options': [
+          'Mengasah pemahaman',
+          'Menghapus data',
+          'Mengganti akun',
+          'Membuka pengaturan',
+        ],
+        'correctIndex': 0,
+      },
+      {
+        'question': 'Bagaimana cara mendapatkan skor terbaik?',
+        'options': [
+          'Menjawab dengan teliti',
+          'Melewati semua soal',
+          'Menutup aplikasi',
+          'Mengabaikan instruksi',
+        ],
+        'correctIndex': 0,
+      },
+      {
+        'question': 'Apa yang ditampilkan setelah kuis selesai?',
+        'options': ['Hasil kuis', 'Halaman login', 'Pengaturan', 'Splash'],
+        'correctIndex': 0,
+      },
+    ];
+  }
+
+  void _openQuiz(
+    BuildContext context, {
+    required _QuizItem quiz,
+    required String categoryTitle,
+    required Map<String, dynamic> quizListArguments,
+  }) {
+    final questions = _sampleQuestions(quiz.title);
+
+    Navigator.pushNamed(
+      context,
+      RouteNames.quiz,
+      arguments: {
+        'quizTitle': quiz.title,
+        'categoryTitle': categoryTitle,
+        'duration': quiz.durationMinutes,
+        'totalQuestions': questions.length,
+        'questions': questions,
+        'quizListArguments': quizListArguments,
+      },
+    );
+  }
+
   void _goBackToDashboard(BuildContext context) {
     var dashboardFound = false;
 
@@ -40,6 +97,13 @@ class QuizListScreen extends StatelessWidget {
     final heroIcon = categoryData['heroIcon'] as IconData? ??
         Icons.computer_rounded;
     final heroColor = categoryData['heroColor'] as Color? ?? AppColors.primary;
+    final quizListArguments = {
+      'categoryTitle': categoryTitle,
+      'heroTitle': heroTitle,
+      'heroDescription': heroDescription,
+      'heroIcon': heroIcon,
+      'heroColor': heroColor,
+    };
 
     final quizzes = [
       _QuizItem(
@@ -138,9 +202,12 @@ class QuizListScreen extends StatelessWidget {
                         durationMinutes: quiz.durationMinutes,
                         icon: quiz.icon,
                         buttonText: quiz.buttonText,
-                        onTap: () {
-                          Navigator.pushNamed(context, RouteNames.quiz);
-                        },
+                        onTap: () => _openQuiz(
+                          context,
+                          quiz: quiz,
+                          categoryTitle: categoryTitle,
+                          quizListArguments: quizListArguments,
+                        ),
                       );
                     },
                   ),
