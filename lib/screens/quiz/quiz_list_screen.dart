@@ -57,6 +57,7 @@ class QuizListScreen extends StatelessWidget {
       arguments: {
         'quizTitle': quiz.title,
         'categoryTitle': categoryTitle,
+        'source': 'quiz_list',
         'duration': quiz.durationMinutes,
         'totalQuestions': questions.length,
         'questions': questions,
@@ -114,7 +115,6 @@ class QuizListScreen extends StatelessWidget {
         questionCount: 15,
         durationMinutes: 10,
         icon: Icons.psychology_rounded,
-        buttonText: 'Mulai Sekarang',
       ),
       _QuizItem(
         title: 'Pemrograman Web',
@@ -124,7 +124,6 @@ class QuizListScreen extends StatelessWidget {
         questionCount: 20,
         durationMinutes: 15,
         icon: Icons.code_rounded,
-        buttonText: 'Mulai Sekarang',
       ),
       _QuizItem(
         title: 'Keamanan Siber',
@@ -134,7 +133,6 @@ class QuizListScreen extends StatelessWidget {
         questionCount: 25,
         durationMinutes: 20,
         icon: Icons.security_rounded,
-        buttonText: 'Mulai Sekarang',
       ),
       _QuizItem(
         title: 'Cloud Computing',
@@ -143,7 +141,6 @@ class QuizListScreen extends StatelessWidget {
         questionCount: 18,
         durationMinutes: 12,
         icon: Icons.cloud_rounded,
-        buttonText: 'Lihat Detail',
       ),
       _QuizItem(
         title: 'Internet of Things',
@@ -152,7 +149,6 @@ class QuizListScreen extends StatelessWidget {
         questionCount: 12,
         durationMinutes: 8,
         icon: Icons.sensors_rounded,
-        buttonText: 'Lihat Detail',
       ),
     ];
 
@@ -199,9 +195,7 @@ class QuizListScreen extends StatelessWidget {
                         description: quiz.description,
                         difficulty: quiz.difficulty,
                         questionCount: quiz.questionCount,
-                        durationMinutes: quiz.durationMinutes,
                         icon: quiz.icon,
-                        buttonText: quiz.buttonText,
                         onTap: () => _openQuiz(
                           context,
                           quiz: quiz,
@@ -236,7 +230,6 @@ class _QuizItem {
   final int questionCount;
   final int durationMinutes;
   final IconData icon;
-  final String buttonText;
 
   const _QuizItem({
     required this.title,
@@ -245,7 +238,6 @@ class _QuizItem {
     required this.questionCount,
     required this.durationMinutes,
     required this.icon,
-    required this.buttonText,
   });
 }
 

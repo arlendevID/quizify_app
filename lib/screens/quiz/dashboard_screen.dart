@@ -9,6 +9,41 @@ import '../../widgets/dashboard/quiz_recommendation_card.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
+  List<Map<String, dynamic>> _sampleQuestions(String quizTitle) {
+    return [
+      {
+        'question': 'Apa fokus utama dari $quizTitle?',
+        'options': ['Konsep dasar', 'Olahraga', 'Musik', 'Kuliner'],
+        'correctIndex': 0,
+      },
+      {
+        'question': 'Apa manfaat mengikuti kuis ini?',
+        'options': [
+          'Mengasah pemahaman',
+          'Menghapus data',
+          'Mengganti akun',
+          'Membuka pengaturan',
+        ],
+        'correctIndex': 0,
+      },
+      {
+        'question': 'Bagaimana cara mendapatkan skor terbaik?',
+        'options': [
+          'Menjawab dengan teliti',
+          'Melewati semua soal',
+          'Menutup aplikasi',
+          'Mengabaikan instruksi',
+        ],
+        'correctIndex': 0,
+      },
+      {
+        'question': 'Apa yang ditampilkan setelah kuis selesai?',
+        'options': ['Hasil kuis', 'Halaman login', 'Pengaturan', 'Splash'],
+        'correctIndex': 0,
+      },
+    ];
+  }
+
   void _goToQuizList(
     BuildContext context, {
     required String categoryTitle,
@@ -26,6 +61,37 @@ class DashboardScreen extends StatelessWidget {
         'heroDescription': heroDescription,
         'heroIcon': heroIcon,
         'heroColor': heroColor,
+      },
+    );
+  }
+
+  void _openRecommendedQuiz(
+    BuildContext context, {
+    required String quizTitle,
+    required String categoryTitle,
+    required String heroTitle,
+    required String heroDescription,
+    required IconData heroIcon,
+    required Color heroColor,
+  }) {
+    final questions = _sampleQuestions(quizTitle);
+
+    Navigator.pushNamed(
+      context,
+      RouteNames.quiz,
+      arguments: {
+        'quizTitle': quizTitle,
+        'categoryTitle': categoryTitle,
+        'source': 'recommendation',
+        'totalQuestions': questions.length,
+        'questions': questions,
+        'quizListArguments': {
+          'categoryTitle': categoryTitle,
+          'heroTitle': heroTitle,
+          'heroDescription': heroDescription,
+          'heroIcon': heroIcon,
+          'heroColor': heroColor,
+        },
       },
     );
   }
@@ -74,11 +140,11 @@ class DashboardScreen extends StatelessWidget {
                           title: 'Garis Depan Siber',
                           badge: 'PALING POPULER',
                           questionCount: 24,
-                          estimatedMinutes: 18,
                           icon: Icons.security_rounded,
                           gradient: AppColors.bluePurpleGradient,
-                          onTap: () => _goToQuizList(
+                          onTap: () => _openRecommendedQuiz(
                             context,
+                            quizTitle: 'Garis Depan Siber',
                             categoryTitle: 'Keamanan Siber',
                             heroTitle: 'Garis Depan Siber',
                             heroDescription:
@@ -92,12 +158,12 @@ class DashboardScreen extends StatelessWidget {
                           title: 'Kalkulus Lanjutan',
                           badge: 'TANTANGAN HARIAN',
                           questionCount: 18,
-                          estimatedMinutes: 15,
                           icon: Icons.functions_rounded,
                           gradient: AppColors.goldGradient,
                           darkText: true,
-                          onTap: () => _goToQuizList(
+                          onTap: () => _openRecommendedQuiz(
                             context,
+                            quizTitle: 'Kalkulus Lanjutan',
                             categoryTitle: 'Matematika',
                             heroTitle: 'Kalkulus Lanjutan',
                             heroDescription:

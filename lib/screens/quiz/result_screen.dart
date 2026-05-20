@@ -23,6 +23,7 @@ class _ResultScreenState extends State<ResultScreen> {
   int correctAnswers = 0;
   int wrongAnswers = 0;
   int scorePercentage = 0;
+  String source = '';
   Map<String, dynamic> quizListArguments = const <String, dynamic>{};
   List<_AnswerReviewData> reviewData = const [];
 
@@ -42,6 +43,7 @@ class _ResultScreenState extends State<ResultScreen> {
       correctAnswers = routeArguments['correctAnswers'] as int? ?? 0;
       wrongAnswers = routeArguments['wrongAnswers'] as int? ?? 0;
       scorePercentage = routeArguments['scorePercentage'] as int? ?? 0;
+      source = routeArguments['source'] as String? ?? source;
       final rawQuizListArguments = routeArguments['quizListArguments'];
       if (rawQuizListArguments is Map<String, dynamic>) {
         quizListArguments = rawQuizListArguments;
@@ -208,14 +210,16 @@ class _ResultScreenState extends State<ResultScreen> {
                   const SizedBox(height: 20),
                   const _LevelUpCard(),
                   const SizedBox(height: 24),
+                  if (source == 'quiz_list') ...[
+                    CustomButton(
+                      text: 'Main Lagi',
+                      onPressed: _goBackToQuizList,
+                      type: QuizifyButtonType.primary,
+                    ),
+                    const SizedBox(height: 14),
+                  ],
                   CustomButton(
-                    text: 'Main Lagi',
-                    onPressed: _goBackToQuizList,
-                    type: QuizifyButtonType.primary,
-                  ),
-                  const SizedBox(height: 14),
-                  CustomButton(
-                    text: 'Kembali ke Dashboard',
+                    text: 'Kembali ke Beranda',
                     onPressed: _goBackToDashboard,
                     type: QuizifyButtonType.outlined,
                   ),

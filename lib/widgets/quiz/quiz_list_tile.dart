@@ -9,9 +9,7 @@ class QuizListTile extends StatelessWidget {
   final String description;
   final String difficulty;
   final int questionCount;
-  final int durationMinutes;
   final IconData icon;
-  final String buttonText;
   final VoidCallback? onTap;
   final bool isCompact;
 
@@ -21,9 +19,7 @@ class QuizListTile extends StatelessWidget {
     required this.description,
     required this.difficulty,
     required this.questionCount,
-    required this.durationMinutes,
     required this.icon,
-    required this.buttonText,
     this.onTap,
     this.isCompact = false,
   });
@@ -111,20 +107,13 @@ class QuizListTile extends StatelessWidget {
                 icon: Icons.help_rounded,
                 text: '$questionCount Soal',
               ),
-              const SizedBox(width: 14),
-              _MetaInfo(
-                icon: Icons.timer_rounded,
-                text: '$durationMinutes Menit',
-              ),
             ],
           ),
           const SizedBox(height: 18),
           CustomButton(
-            text: buttonText,
+            text: 'Mulai Sekarang',
             onPressed: onTap,
-            type: buttonText.toLowerCase().contains('detail')
-                ? QuizifyButtonType.outlined
-                : QuizifyButtonType.primary,
+            type: QuizifyButtonType.primary,
             height: 52,
           ),
         ],

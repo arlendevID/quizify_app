@@ -7,7 +7,6 @@ class QuizRecommendationCard extends StatelessWidget {
   final String title;
   final String badge;
   final int questionCount;
-  final int estimatedMinutes;
   final IconData icon;
   final Gradient gradient;
   final bool darkText;
@@ -18,7 +17,6 @@ class QuizRecommendationCard extends StatelessWidget {
     required this.title,
     required this.badge,
     required this.questionCount,
-    required this.estimatedMinutes,
     required this.icon,
     required this.gradient,
     this.darkText = false,
@@ -96,19 +94,6 @@ class QuizRecommendationCard extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       '$questionCount soal',
-                      style: AppTextStyles.caption.copyWith(
-                        color: textColor.withOpacity(0.78),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      Icons.timer_rounded,
-                      color: textColor.withOpacity(0.78),
-                      size: 17,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '$estimatedMinutes menit',
                       style: AppTextStyles.caption.copyWith(
                         color: textColor.withOpacity(0.78),
                       ),

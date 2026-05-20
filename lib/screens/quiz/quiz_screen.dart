@@ -18,16 +18,16 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  static const int secondsPerQuestion = 14;
+  static const int secondsPerQuestion = 40;
 
   int currentIndex = 0;
   String quizTitle = 'Quiz';
   String categoryTitle = 'Umum';
-  int durationMinutes = 10;
   bool hasLoadedArguments = false;
   bool isSubmitting = false;
   int remainingSeconds = secondsPerQuestion;
   Timer? questionTimer;
+  String source = '';
   Map<String, dynamic> quizListArguments = const <String, dynamic>{};
   final Map<int, int> selectedAnswers = {};
   final Set<int> evaluatedQuestions = {};
@@ -111,7 +111,7 @@ class _QuizScreenState extends State<QuizScreen> {
       quizTitle = routeArguments['quizTitle'] as String? ?? quizTitle;
       categoryTitle =
           routeArguments['categoryTitle'] as String? ?? categoryTitle;
-      durationMinutes = routeArguments['duration'] as int? ?? durationMinutes;
+      source = routeArguments['source'] as String? ?? source;
       final rawQuizListArguments = routeArguments['quizListArguments'];
       if (rawQuizListArguments is Map<String, dynamic>) {
         quizListArguments = rawQuizListArguments;
@@ -273,6 +273,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return {
       'quizTitle': quizTitle,
+      'source': source,
       'totalQuestions': totalQuestions,
       'correctAnswers': correctAnswers,
       'wrongAnswers': wrongAnswers,
@@ -317,7 +318,6 @@ class _QuizScreenState extends State<QuizScreen> {
                 categoryTitle: categoryTitle,
                 currentQuestion: currentIndex + 1,
                 totalQuestions: questions.length,
-                durationMinutes: durationMinutes,
                 progress: progress,
               ),
 
@@ -420,7 +420,6 @@ class _QuizHeader extends StatelessWidget {
   final String categoryTitle;
   final int currentQuestion;
   final int totalQuestions;
-  final int durationMinutes;
   final double progress;
 
   const _QuizHeader({
@@ -428,7 +427,6 @@ class _QuizHeader extends StatelessWidget {
     required this.categoryTitle,
     required this.currentQuestion,
     required this.totalQuestions,
-    required this.durationMinutes,
     required this.progress,
   });
 
@@ -445,7 +443,7 @@ class _QuizHeader extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          '$categoryTitle - $durationMinutes menit',
+          categoryTitle,
           style: AppTextStyles.bodySmall.copyWith(
             color: AppColors.textSecondary,
           ),
